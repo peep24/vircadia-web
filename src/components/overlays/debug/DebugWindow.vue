@@ -44,7 +44,10 @@
                 <div></div>
                 <div>Avatars: {{ $store.state.avatars.count }} </div>
                 <q-list v-for="ava in $store.state.avatars.avatarsInfo.values()" :key="ava">
-                    <div>{{ ava.stringify() }} </div>
+                    <h6 style="margin:20px 0 0 0;">{{ava.displayName}}</h6>
+                    <q-list v-for="(value, name) in ava" :key="name">
+                        {{ name }}: {{ value }}
+                    </q-list>
                 </q-list>
 
             </q-tab-panel>
