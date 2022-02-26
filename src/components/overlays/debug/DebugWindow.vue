@@ -39,6 +39,7 @@
                 </q-list>
             </q-tab-panel>
             <q-tab-panel name="Avatars">
+                 <button v-on:click="consoleLog">Click ME</button>
                 <div>DisplayName: {{ $store.state.avatar.displayName }}</div>
                 <div>Location: {{ $store.state.avatar.location }}</div>
                 <div></div>
@@ -88,6 +89,13 @@ export default defineComponent({
     },
 
     methods: {
+        consoleLog: function() {
+            // for (const avatar of this.$store.state.avatars.avatarsInfo) {
+            //     console.log(avatar[1].position);
+            // }
+            console.log(this.$store.state);
+
+        },
         getProfilePicture(username: string): string | null {
             // Should store profile pictures after retrieving and then pull each
             // subsequent one from cache instead of hitting metaverse every time.

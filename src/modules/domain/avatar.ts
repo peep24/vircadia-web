@@ -97,12 +97,19 @@ export class DomainAvatar extends Client {
         this.onStateChange.emit(this.#_domain, this, pNewState);
     }
 
+
     public startGameLoop(): void {
-        if (typeof this.#_gameLoopTimer === "undefined") {
-            this.#_gameLoopFunction = this.update.bind(this);
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            this.#_gameLoopTimer = setTimeout(this.#_gameLoopFunction, 100);
-        }
+        this.update();
+        requestAnimationFrame(this.startGameLoop.bind(this));
+        console.log("JAMES - GAME LOOP FUNCTION RAN");
+
+        // if (typeof this.#_gameLoopTimer === "undefined") {
+
+        // this.#_gameLoopFunction = this.update.bind(this);
+        // // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        // this.#_gameLoopTimer = setTimeout(this.#_gameLoopFunction, 100);
+
+    // }
     }
 
     public stopGameLoop(): void {
