@@ -1,3 +1,4 @@
+/* eslint-disable */
 /*
 //  Copyright 2021 Vircadia contributors.
 //
@@ -14,11 +15,13 @@ import { Color3, Color4, Vector3 } from "@babylonjs/core/Maths/math";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import "@babylonjs/loaders/glTF";
 import "@babylonjs/core/Meshes/meshBuilder";
+import { Store } from "@Store/index";
 // General Modules
 import Log from "@Modules/debugging/log";
 // System Modules
 import { v4 as uuidv4 } from "uuid";
 import { VVector3 } from ".";
+import { off } from "process";
 
 /**
  * this.addEntity() takes parameters describing the entity to create and add to
@@ -30,7 +33,7 @@ interface EntityProps {
     id?: string;        // lookup identifier. One is generated if no specified
     name: string;
     type: "Shape" | "Model";
-    shape?: "box" | "sphere" | "cylinder" | "cone" | "triangle" ; // if type=="Shape"
+    shape?: "box" | "sphere" | "cylinder" | "cone" | "triangle" | "plane" ; // if type=="Shape"
     modelUrl?: string;  // if type=="Model"
     position: { x: number; y: number; z: number };
     rotation: { x: number; y: number; z: number; w?: number };
@@ -109,6 +112,11 @@ export class VScene {
             case "Shape":
                 if (pProperties.shape) {
                     switch (pProperties.shape.toLowerCase()) {
+                        case "plane":
+                            // entity = MeshBuilder.CreatePlane(pProperties.name, {}, this._scene);
+                            // Swapped out for fixed plane not using pProperties so i can have doublesided
+                            entity = BABYLON.Mesh.CreatePlane("plane", 1, this._scene, false, BABYLON.Mesh.DOUBLESIDE);
+                            break;
                         case "box":
                             entity = MeshBuilder.CreateBox(pProperties.name, {}, this._scene);
                             break;
@@ -176,6 +184,15 @@ export class VScene {
         return null;
     }
 
+    animationFunction() {
+            const ball = this._scene.getMeshByName("sphere");
+            for (const avatar of Store.state.avatars.avatarsInfo.values()) {
+                ball?.setPositionWithLocalVector(new BABYLON.Vector3(avatar.position.x, avatar.position.z, avatar.position.y));
+            }
+            requestAnimationFrame(this.animationFunction.bind(this))
+    }
+    
+
     // Scripting would look like:
     // sceneInstance.deleteById
     deleteEntityById(id: string): void {
@@ -209,6 +226,7 @@ export class VScene {
      * @returns {Promise<void>} when completed
      */
     async buildTestScene(): Promise<void> {
+        this.animationFunction();
         const aScene = this._scene;
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         aScene.clearColor = new Color4(0.8, 0.8, 0.8, 0.0);
@@ -216,87 +234,107 @@ export class VScene {
         aScene.createDefaultEnvironment();
 
         await this.addEntity({
-            name: "box",
+            name: "plane",
             type: "Shape",
-            shape: "box",
-            position: { x: -5, y: 0, z: 0 },
-            rotation: { x: -0.2, y: -0.4, z: 0 },
+            shape: "plane",
+            position: { x: 0, y: 0, z: 0 },
+            rotation: { x: 0, y: 0, z: 0 },
             dimensions: { x: 3, y: 3, z: 3 },
-            color: { r: 1, g: 0, b: 0 }
+            color: { r: 128, g: 128, b: 128 }
         });
 
         await this.addEntity({
             name: "sphere",
             type: "Shape",
             shape: "sphere",
-            position: { x: -3, y: 0, z: 0 },
+            position: { x: 0, y: 0, z: -0.1 },
             rotation: { x: 0, y: -0.5, z: 0 },
-            dimensions: { x: 3, y: 3, z: 3 },
-            color: { r: 0, g: 0.58, b: 0.86 }
+            dimensions: { x: 0.1, y: 0.1, z: 0.1 },
+            color: { r: 255, g: 0, b: 0 }
         });
 
-        await this.addEntity({
-            name: "cone",
-            type: "Shape",
-            shape: "cone",
-            position: { x: -1, y: 0, z: 0 },
-            rotation: { x: 0, y: -0.5, z: 0 },
-            dimensions: { x: 1, y: 1, z: 1 },
-            color: { r: 1, g: 0.58, b: 0.86 }
-        });
+        // await this.addEntity({
+        //     name: "box",
+        //     type: "Shape",
+        //     shape: "box",
+        //     position: { x: -5, y: 0, z: 0 },
+        //     rotation: { x: -0.2, y: -0.4, z: 0 },
+        //     dimensions: { x: 3, y: 3, z: 3 },
+        //     color: { r: 1, g: 0, b: 0 }
+        // });
 
-        await this.addEntity({
-            name: "cylinder",
-            type: "Shape",
-            shape: "cylinder",
-            position: { x: 1, y: 0, z: 0 },
-            rotation: { x: 0, y: -0.5, z: 0 },
-            dimensions: { x: 1, y: 1, z: 1 },
-            color: { r: 1, g: 0.58, b: 0.86 }
-        });
+        // await this.addEntity({
+        //     name: "sphere",
+        //     type: "Shape",
+        //     shape: "sphere",
+        //     position: { x: -3, y: 0, z: 0 },
+        //     rotation: { x: 0, y: -0.5, z: 0 },
+        //     dimensions: { x: 3, y: 3, z: 3 },
+        //     color: { r: 0, g: 0.58, b: 0.86 }
+        // });
 
-        await this.addEntity({
-            name: "triangle",
-            type: "Shape",
-            shape: "triangle",
-            position: { x: 3, y: 0, z: 0 },
-            rotation: { x: 0, y: -0.5, z: 0 },
-            dimensions: { x: 1, y: 1, z: 1 },
-            color: { r: 1, g: 0.58, b: 0.86 }
-        });
+        // await this.addEntity({
+        //     name: "cone",
+        //     type: "Shape",
+        //     shape: "cone",
+        //     position: { x: -1, y: 0, z: 0 },
+        //     rotation: { x: 0, y: -0.5, z: 0 },
+        //     dimensions: { x: 1, y: 1, z: 1 },
+        //     color: { r: 1, g: 0.58, b: 0.86 }
+        // });
 
-        const entityToDeleteID = uuidv4();
+        // await this.addEntity({
+        //     name: "cylinder",
+        //     type: "Shape",
+        //     shape: "cylinder",
+        //     position: { x: 1, y: 0, z: 0 },
+        //     rotation: { x: 0, y: -0.5, z: 0 },
+        //     dimensions: { x: 1, y: 1, z: 1 },
+        //     color: { r: 1, g: 0.58, b: 0.86 }
+        // });
 
-        await this.addEntity({
-            name: "entityToDeleteByID",
-            id: entityToDeleteID,
-            type: "Shape",
-            shape: "triangle",
-            position: { x: 3, y: -2, z: 0 },
-            rotation: { x: 0, y: -0.5, z: 0 },
-            dimensions: { x: 1, y: 1, z: 1 },
-            color: { r: 1, g: 0.58, b: 0.86 }
-        });
-        this.deleteEntityById(entityToDeleteID);
+        // await this.addEntity({
+        //     name: "triangle",
+        //     type: "Shape",
+        //     shape: "triangle",
+        //     position: { x: 3, y: 0, z: 0 },
+        //     rotation: { x: 0, y: -0.5, z: 0 },
+        //     dimensions: { x: 1, y: 1, z: 1 },
+        //     color: { r: 1, g: 0.58, b: 0.86 }
+        // });
 
-        await this.addEntity({
-            name: "entityToDeleteByName",
-            type: "Shape",
-            shape: "triangle",
-            position: { x: 3, y: 2, z: 0 },
-            rotation: { x: 0, y: -0.5, z: 0 },
-            dimensions: { x: 1, y: 1, z: 1 },
-            color: { r: 1, g: 0.58, b: 0.86 }
-        });
-        this.deleteEntityByName("entityToDeleteByName");
+        // const entityToDeleteID = uuidv4();
 
-        await this.addEntity({
-            name: "fox",
-            type: "Model",
-            modelUrl: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF/Fox.gltf",
-            position: { x: 5, y: 0, z: 0 },
-            rotation: { x: 0, y: -0.5, z: 0 },
-            dimensions: { x: 0.05, y: 0.05, z: 0.05 }
-        });
+        // await this.addEntity({
+        //     name: "entityToDeleteByID",
+        //     id: entityToDeleteID,
+        //     type: "Shape",
+        //     shape: "triangle",
+        //     position: { x: 3, y: -2, z: 0 },
+        //     rotation: { x: 0, y: -0.5, z: 0 },
+        //     dimensions: { x: 1, y: 1, z: 1 },
+        //     color: { r: 1, g: 0.58, b: 0.86 }
+        // });
+        // this.deleteEntityById(entityToDeleteID);
+
+        // await this.addEntity({
+        //     name: "entityToDeleteByName",
+        //     type: "Shape",
+        //     shape: "triangle",
+        //     position: { x: 3, y: 2, z: 0 },
+        //     rotation: { x: 0, y: -0.5, z: 0 },
+        //     dimensions: { x: 1, y: 1, z: 1 },
+        //     color: { r: 1, g: 0.58, b: 0.86 }
+        // });
+        // this.deleteEntityByName("entityToDeleteByName");
+
+        // await this.addEntity({
+        //     name: "fox",
+        //     type: "Model",
+        //     modelUrl: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF/Fox.gltf",
+        //     position: { x: 5, y: 0, z: 0 },
+        //     rotation: { x: 0, y: -0.5, z: 0 },
+        //     dimensions: { x: 0.05, y: 0.05, z: 0.05 }
+        // });
     }
 }
