@@ -31,6 +31,7 @@
             >
             <q-tab name="Messages" icon="chat" label="Messages" />
             <q-tab name="Avatars" icon="people" label="Avatars" />
+            <q-tab name="Testing" icon="code" label="Testing" />
         </q-tabs>
         <q-tab-panels v-model="tab" animated>
             <q-tab-panel name="Messages">
@@ -52,6 +53,13 @@
                 </q-list>
 
             </q-tab-panel>
+            <q-tab-panel name="Testing">
+                 <button v-on:click="runTest">UP</button>
+                 <!-- <button v-on:click="runTest">Down</button>
+                 <button v-on:click="runTest">Left</button>
+                 <button v-on:click="fireTs">Right</button> -->
+            </q-tab-panel>
+
         </q-tab-panels>
         <!-- <q-inner-loading :showing="">
             <q-spinner-gears size="50px" color="primary" />
@@ -63,10 +71,12 @@
 
 import { defineComponent } from "vue";
 import { AMessage, FloofChatMessage } from "@Modules/domain/message";
+// import { Greeter } from "@Modules/domain/testing";
 
 // import Log from "@Modules/debugging/log";
 
 import OverlayShell from "../OverlayShell.vue";
+import { Store, Actions as StoreActions } from "@Store/index";
 
 export default defineComponent({
     name: "DebugWindow",
@@ -89,6 +99,13 @@ export default defineComponent({
     },
 
     methods: {
+        runTest() {
+            // console.log(StoreActions.TEST_ACTION);
+
+            const position = { x: 10, y: 10, z: -0.1 };
+            // eslint-disable-next-line no-void
+            void Store.dispatch(StoreActions.TEST_MOVEMENT, position);
+        },
         consoleLog: function() {
             // for (const avatar of this.$store.state.avatars.avatarsInfo) {
             //     console.log(avatar[1].position);

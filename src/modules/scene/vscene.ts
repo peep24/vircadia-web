@@ -191,6 +191,14 @@ export class VScene {
             }
             requestAnimationFrame(this.animationFunction.bind(this))
     }
+
+    webAnimationFunction() {
+        const ball = this._scene.getMeshByName("WebAvatar");
+
+        ball?.setPositionWithLocalVector(new BABYLON.Vector3(Store.state.avatar.position.x, Store.state.avatar.position.z, Store.state.avatar.position.y));
+        
+        requestAnimationFrame(this.webAnimationFunction.bind(this))
+}
     
 
     // Scripting would look like:
@@ -221,17 +229,22 @@ export class VScene {
         }
     }
 
+
+
     /**
      * Build a simple test collection of entities in this scene. Also includes some testing operations.
      * @returns {Promise<void>} when completed
      */
     async buildTestScene(): Promise<void> {
         this.animationFunction();
+        this.webAnimationFunction();
         const aScene = this._scene;
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         aScene.clearColor = new Color4(0.8, 0.8, 0.8, 0.0);
         aScene.createDefaultCameraOrLight(true, true, true);
         aScene.createDefaultEnvironment();
+
+        console.log("my Avatar Location", Store.state.avatar.location)
 
         await this.addEntity({
             name: "plane",
@@ -242,6 +255,17 @@ export class VScene {
             dimensions: { x: 3, y: 3, z: 3 },
             color: { r: 128, g: 128, b: 128 }
         });
+
+        await this.addEntity({
+            name: "WebAvatar",
+            type: "Shape",
+            shape: "sphere",
+            position: { x: 1, y: 1, z: -0.1 },
+            rotation: { x: 0, y: -0.5, z: 0 },
+            dimensions: { x: 0.1, y: 0.1, z: 0.1 },
+            color: { r: 255, g: 0, b: 255 }
+        });
+
 
         await this.addEntity({
             name: "sphere",

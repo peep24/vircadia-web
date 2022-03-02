@@ -101,7 +101,7 @@ export class DomainAvatar extends Client {
     public startGameLoop(): void {
         this.update();
         requestAnimationFrame(this.startGameLoop.bind(this));
-        console.log("JAMES - GAME LOOP FUNCTION RAN");
+        // console.log("JAMES - GAME LOOP FUNCTION RAN");
 
         // if (typeof this.#_gameLoopTimer === "undefined") {
 

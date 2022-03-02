@@ -1,3 +1,4 @@
+/* eslint-disable */
 //  Copyright 2021 Vircadia contributors.
 //
 //  Distributed under the Apache License, Version 2.0.
@@ -30,6 +31,22 @@ import { onAccessTokenChangePayload, onAttributeChangePayload } from "@Modules/a
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import Log from "@Modules/debugging/log";
 import { toJSON } from "@Modules/debugging";
+import { type } from "os";
+
+// import { Greeter, Test } from "@Modules/domain/testing";
+// import { Test } from "@Modules/domain/testing";
+
+
+// James Testing //////////////////////////////////
+// const greeter = new Greeter("world");
+// console.log(greeter);
+
+// const tester = new Test();
+// setTimeout(tester.runTest, 500);
+
+
+// End James Testing //////////////////////////////////
+
 
 /**
  * $store of shared state used by the Vue components. The Store that is created
@@ -90,6 +107,8 @@ export interface UpdateAvatarValuePayload {
 }
 
 export enum Actions {
+    TEST_ACTION = "TEST_ACTION",
+    TEST_MOVEMENT = "TEST_MOVEMENT",
     SET_METAVERSE_URL = "SET_METAVERSE_URL",
     SET_DOMAIN_URL = "SET_DOMAIN_URL",
     UPDATE_METAVERSE = "UPDATE_METAVERSE",
@@ -454,6 +473,31 @@ export const Store = createStore<IRootState>({
 
     },
     actions: {
+        // eslint-disable-next-line @typescript-eslint/require-await
+        async [Actions.TEST_ACTION]() {
+            console.log("My store function ran");
+         
+        },
+        // eslint-disable-next-line @typescript-eslint/require-await
+        async [Actions.TEST_MOVEMENT](pContext: ActionContext<IRootState, IRootState>,
+            pPayload: UpdateDomainPayload) {
+            //console.log("Test Movement ran", pContext, pPayload);
+            //const domainLoc = pPayload.domain.DomainClient?.location ?? "Unconnected";
+            
+            const domainLoc = "ws://127.0.0.1:40102";
+
+            pContext.commit(Mutations.MUTATE, {
+                property: "avatar",
+                with: {
+                    position: pPayload,
+                    location: `${domainLoc}/${pPayload}`
+                }
+                
+            });
+            console.log("position moved")
+            },
+            
+                
         /**
          * Called when metaverse-server information changes and the UI should be updated
          * @param {ActionContext} pContext

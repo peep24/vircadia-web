@@ -150,7 +150,7 @@ module.exports = {
         "@typescript-eslint/no-loss-of-precision": ["error"],
         "no-magic-numbers": "off",
         "@typescript-eslint/no-magic-numbers": [
-            "error",
+            "off",
             {
                 "ignore": [-1, 0, 1, 2],
                 "ignoreEnums": true,
