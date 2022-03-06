@@ -15,6 +15,8 @@ import { AvatarMixer, SignalEmitter, vec3, Uuid, MyAvatarInterface, ScriptAvatar
 
 import Log from "@Modules/debugging/log";
 
+import { VScene } from "@Modules/scene/vscene";
+import { Renderer } from "@Modules/scene/renderer";
 // Allow 'get' lines to be compact
 /* eslint-disable @typescript-eslint/brace-style */
 
@@ -32,6 +34,7 @@ export class DomainAvatar extends Client {
     #_myAvatarLastPosition: vec3;
     #_gameLoopTimer: Nullable<NodeJS.Timeout>;
     #_gameLoopFunction: Nullable<()=>void>;
+    #_scene: VScene;
 
     public get Mixer(): Nullable<AvatarMixer> { return this.#_avaMixer; }
     public get MyAvatar(): Nullable<MyAvatarInterface> { return this.#_avaMixer?.myAvatar; }
@@ -55,6 +58,8 @@ export class DomainAvatar extends Client {
         this.#_avatarsInfo = new Map<Uuid, ScriptAvatar>();
         this.#_avaMixer.avatarList.avatarAdded.connect(this._handleOnAvatarAdded.bind(this));
         this.#_avaMixer.avatarList.avatarRemoved.connect(this._handleOnAvatarRemoved.bind(this));
+
+        this.#_scene = Renderer.getScene(0);
 
         // Copy the information into $store for the UI
         this._updateOtherAvatarInfo();
@@ -132,6 +137,7 @@ export class DomainAvatar extends Client {
      */
     // eslint-disable-next-line class-methods-use-this
     private _handleOnAvatarAdded(pAvatarId: Uuid) {
+        this.#_scene.addOtherAvatar(pAvatarId.toString(), Vec3.ZERO);
         Log.debug(Log.types.AVATAR, `DomainAvatar: Avatar added: ${pAvatarId.stringify()}`);
         if (this.#_avaMixer) {
             const info = this.#_avaMixer.avatarList.getAvatar(pAvatarId);
@@ -161,6 +167,7 @@ export class DomainAvatar extends Client {
      */
     // eslint-disable-next-line class-methods-use-this
     private _handleOnAvatarRemoved(pAvatarId: Uuid) {
+        this.#_scene.deleteEntityById(pAvatarId.toString());
         Log.debug(Log.types.AVATAR, `DomainAvatar: Avatar removed: ${pAvatarId.stringify()}`);
         const info = this.#_avatarsInfo.get(pAvatarId);
         if (info) {

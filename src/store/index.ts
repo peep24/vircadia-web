@@ -372,7 +372,7 @@ export const Store = createStore<IRootState>({
             // This supresses the periodic renderer stat update from being output on the console
             if (payload && payload.property && payload.property !== "renderer") {
                 // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                Log.debug(Log.types.OTHER, `MUTATE: ${toJSON(payload)}`);
+                // Log.debug(Log.types.OTHER, `MUTATE: ${toJSON(payload)}`);
             }
             // END DEBUG DEBUG DEBUG
             // Create the target location to store the mutation
@@ -535,7 +535,7 @@ export const Store = createStore<IRootState>({
         async [Actions.UPDATE_ACCOUNT_INFO](pContext: ActionContext<IRootState, IRootState>,
             pPayload: UpdateAccountInfoPayload): Promise<void> {
 
-            Log.debug(Log.types.OTHER, `StoreAction.UpdateAccountInfo`);
+            // Log.debug(Log.types.OTHER, `StoreAction.UpdateAccountInfo`);
             const info = pPayload.accountInfo;
             pContext.commit(Mutations.MUTATE, {
                 property: "account",
@@ -571,7 +571,7 @@ export const Store = createStore<IRootState>({
         async [Actions.UPDATE_AVATAR_INFO](pContext: ActionContext<IRootState, IRootState>,
             pPayload: UpdateAvatarInfoPayload): Promise<void> {
 
-            Log.debug(Log.types.OTHER, `StoreAction.UpdateAvatarInfo`);
+            // Log.debug(Log.types.OTHER, `StoreAction.UpdateAvatarInfo`);
 
             const domainLoc = pPayload.domain.DomainClient?.location ?? "Unconnected";
             // If we have information on my avatar, update same

@@ -22,6 +22,7 @@ import Log from "@Modules/debugging/log";
 import { v4 as uuidv4 } from "uuid";
 import { VVector3 } from ".";
 import { off } from "process";
+import { vec3 } from "@vircadia/web-sdk";
 
 /**
  * this.addEntity() takes parameters describing the entity to create and add to
@@ -184,27 +185,72 @@ export class VScene {
         return null;
     }
 
-    animationFunction() {
-            const ball = this._scene.getMeshByName("sphere");
-            for (const avatar of Store.state.avatars.avatarsInfo.values()) {
-                ball?.setPositionWithLocalVector(new BABYLON.Vector3(avatar.position.x, avatar.position.z, avatar.position.y));
-            }
-            requestAnimationFrame(this.animationFunction.bind(this))
+    theGameLoop() {
+        this.positionMyAvatar();
+        this.checkOtherAvatarsPos();
+        requestAnimationFrame(this.theGameLoop.bind(this));
     }
 
-    webAnimationFunction() {
-        const ball = this._scene.getMeshByName("WebAvatar");
+    checkOtherAvatarsPos() {
+        // avatar.sessionId.toString() != ball?.name
+        for (const avatar of Store.state.avatars.avatarsInfo.values()) {
+            let ball = this._scene.getMeshByName(avatar.sessionId.toString());
+            if(ball) {
+                // This needs to be rethought as currently looping over and over!! Should stop when position is updated?
+                if (ball?.position.x != avatar.position.x || ball?.position.x != avatar.position.x || ball?.position.z != avatar.position.z){
+                    this.positionOtherAvatar(avatar.sessionId.toString(), avatar.position)
+                } 
+                
+            } 
+            
+        };
+    }
 
+    positionOtherAvatar(uuid: string, position: vec3) {
+            console.log("function ran: positionOtherAvatar", uuid);
+            const ball = this._scene.getMeshByName(uuid);
+                ball?.setPositionWithLocalVector(new BABYLON.Vector3(position.x, position.z, position.y));
+    }
+
+    async addOtherAvatar(uuid: string, position: vec3) {
+        await this.addEntity({
+            name: uuid,
+            type: "Shape",
+            shape: "sphere",
+            position: position,
+            rotation: { x: 0, y: -0.5, z: 0 },
+            dimensions: { x: 0.1, y: 0.1, z: 0.1 },
+            color: { r: 255, g: 255, b: 0 }
+        }); 
+    }
+
+    positionMyAvatar() {
+        const ball = this._scene.getMeshByName("WebAvatar");
         ball?.setPositionWithLocalVector(new BABYLON.Vector3(Store.state.avatar.position.x, Store.state.avatar.position.z, Store.state.avatar.position.y));
-        
-        requestAnimationFrame(this.webAnimationFunction.bind(this))
-}
+    }
+
+    // When scene is initialized add existing other avatars in world to scene.
+    //Currently not working correctly! assumed due to store not being updated properly?
+    async addOtherAvatarsToScene(): Promise<void> {
+        for (const avatar of Store.state.avatars.avatarsInfo.values()) {
+            console.log("inside for loop of addingOtherAvatarsToScene");
+            await this.addEntity({
+                name: avatar.sessionId.toString(),
+                type: "Shape",
+                shape: "sphere",
+                position: { x: avatar.position.x, y: avatar.position.y, z: avatar.position.z },
+                rotation: { x: 0, y: -0.5, z: 0 },
+                dimensions: { x: 0.1, y: 0.1, z: 0.1 },
+                color: { r: 255, g: 255, b: 0 }
+            });
+        }
+    }
     
 
     // Scripting would look like:
     // sceneInstance.deleteById
     deleteEntityById(id: string): void {
-        const entityToDelete = this._scene.getNodeByID(id);
+        const entityToDelete = this._scene.getMeshByName(id);
 
         if (entityToDelete) {
             entityToDelete.dispose();
@@ -236,15 +282,13 @@ export class VScene {
      * @returns {Promise<void>} when completed
      */
     async buildTestScene(): Promise<void> {
-        this.animationFunction();
-        this.webAnimationFunction();
+        this.addOtherAvatarsToScene();
+        this.theGameLoop();
         const aScene = this._scene;
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         aScene.clearColor = new Color4(0.8, 0.8, 0.8, 0.0);
         aScene.createDefaultCameraOrLight(true, true, true);
         aScene.createDefaultEnvironment();
-
-        console.log("my Avatar Location", Store.state.avatar.location)
 
         await this.addEntity({
             name: "plane",
@@ -265,17 +309,16 @@ export class VScene {
             dimensions: { x: 0.1, y: 0.1, z: 0.1 },
             color: { r: 255, g: 0, b: 255 }
         });
-
-
-        await this.addEntity({
-            name: "sphere",
-            type: "Shape",
-            shape: "sphere",
-            position: { x: 0, y: 0, z: -0.1 },
-            rotation: { x: 0, y: -0.5, z: 0 },
-            dimensions: { x: 0.1, y: 0.1, z: 0.1 },
-            color: { r: 255, g: 0, b: 0 }
-        });
+ 
+        // await this.addEntity({
+        //     name: "sphere",
+        //     type: "Shape",
+        //     shape: "sphere",
+        //     position: { x: 0, y: 0, z: -0.1 },
+        //     rotation: { x: 0, y: -0.5, z: 0 },
+        //     dimensions: { x: 0.1, y: 0.1, z: 0.1 },
+        //     color: { r: 255, g: 0, b: 0 }
+        // });
 
         // await this.addEntity({
         //     name: "box",
