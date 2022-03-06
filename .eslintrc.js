@@ -397,7 +397,7 @@ module.exports = {
         "jest/no-done-callback": "off",
 
         // BEGIN DEBUG DEBUG
-        /*
+        
         // Turn off 'any' errors in process of doing JS to TS conversion
         "prefer-promise-reject-errors": "off",
         "@typescript-eslint/no-unsafe-call": "off",
@@ -411,7 +411,7 @@ module.exports = {
         "@typescript-eslint/no-var-requires": "off",
         "@typescript-eslint/no-floating-promises": "off",
         "@typescript-eslint/no-this-alias": "off"
-        */
+        
         // END DEBUG DEBUG
 
     }

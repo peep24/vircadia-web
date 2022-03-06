@@ -1,3 +1,4 @@
+/* eslint-disable */
 /*
 //  Copyright 2021 Vircadia contributors.
 //
@@ -70,8 +71,9 @@ export class DomainAvatar extends Client {
                 // clone position so object in SDK is not pointed to
                 const pos = { ...this.#_avaMixer.myAvatar.position };
                 if (pos !== this.#_myAvatarLastPosition) {
+                    this.#_avaMixer!.myAvatar.position = Store.state.avatar.position;
                     this.#_myAvatarLastPosition = pos;
-                    this._updateAvatarPosition(pos);
+                    // this._updateAvatarPosition(pos);
                 }
             }
             this._updateOtherAvatarInfo();

@@ -54,10 +54,11 @@
 
             </q-tab-panel>
             <q-tab-panel name="Testing">
-                 <button v-on:click="runTest">UP</button>
-                 <!-- <button v-on:click="runTest">Down</button>
-                 <button v-on:click="runTest">Left</button>
-                 <button v-on:click="fireTs">Right</button> -->
+                 <button v-on:click="moveAvatar('forward')">FORWARD</button>
+                 <button v-on:click="moveAvatar('back')">BACKWARD</button>
+                 <button v-on:click="moveAvatar('left')">LEFT</button>
+                 <button v-on:click="moveAvatar('right')">RIGHT</button>
+                 <div> Store State Location: {{ $store.state.avatar.position }}</div>
             </q-tab-panel>
 
         </q-tab-panels>
@@ -99,6 +100,40 @@ export default defineComponent({
     },
 
     methods: {
+        moveAvatar(direction: string): void {
+            console.log("Moving function", direction);
+
+            // spread syntax to clone object so we do not get Store mutation error.
+            // const curPos = Store.state.avatar.position;
+            const curPos = { ...Store.state.avatar.position };
+
+            switch (direction) {
+                case "forward": {
+
+                    curPos.x = curPos.x + 1;
+                    // eslint-disable-next-line no-void
+                    void Store.dispatch(StoreActions.TEST_MOVEMENT, curPos);
+                    break; }
+                case "back": {
+                    curPos.x = curPos.x - 1;
+                    // eslint-disable-next-line no-void
+                    void Store.dispatch(StoreActions.TEST_MOVEMENT, curPos);
+                    break; }
+                case "right": {
+                    curPos.y = curPos.y + 1;
+                    // eslint-disable-next-line no-void
+                    void Store.dispatch(StoreActions.TEST_MOVEMENT, curPos);
+                    break; }
+                case "left": {
+                    curPos.y = curPos.y - 1;
+                    // eslint-disable-next-line no-void
+                    void Store.dispatch(StoreActions.TEST_MOVEMENT, curPos);
+                    break; }
+                default:
+                    break;
+            }
+        },
+
         runTest() {
             // console.log(StoreActions.TEST_ACTION);
 
