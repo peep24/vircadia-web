@@ -287,8 +287,11 @@ export class VScene {
         const aScene = this._scene;
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         aScene.clearColor = new Color4(0.8, 0.8, 0.8, 0.0);
-        aScene.createDefaultCameraOrLight(true, true, true);
+        // aScene.createDefaultCameraOrLight(true, true, true);
         aScene.createDefaultEnvironment();
+        var camera = new BABYLON.FreeCamera("sceneCamera", new BABYLON.Vector3(0, 1, -10), aScene);
+        aScene.activeCamera?.attachControl(aScene, true);
+        camera.inputs.attached.keyboard.detachControl();
 
         await this.addEntity({
             name: "plane",
