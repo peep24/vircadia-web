@@ -187,29 +187,19 @@ export class VScene {
 
     theGameLoop() {
         this.positionMyAvatar();
-        this.checkOtherAvatarsPos();
+        this.positionOtherAvatar();
         requestAnimationFrame(this.theGameLoop.bind(this));
     }
 
-    checkOtherAvatarsPos() {
-        // avatar.sessionId.toString() != ball?.name
-        for (const avatar of Store.state.avatars.avatarsInfo.values()) {
-            let ball = this._scene.getMeshByName(avatar.sessionId.toString());
-            if(ball) {
-                // This needs to be rethought as currently looping over and over!! Should stop when position is updated?
-                if (ball?.position.x != avatar.position.x || ball?.position.x != avatar.position.x || ball?.position.z != avatar.position.z){
-                    this.positionOtherAvatar(avatar.sessionId.toString(), avatar.position)
-                } 
-                
-            } 
-            
-        };
-    }
-
-    positionOtherAvatar(uuid: string, position: vec3) {
-            console.log("function ran: positionOtherAvatar", uuid);
-            const ball = this._scene.getMeshByName(uuid);
-                ball?.setPositionWithLocalVector(new BABYLON.Vector3(position.x, position.z, position.y));
+    positionOtherAvatar() {
+        if (Store.state.avatars.count > 0) {
+            for (const avatar of Store.state.avatars.avatarsInfo.values()) {
+                let ball = this._scene.getMeshByName(avatar.sessionId.toString());
+                if(ball) {
+                    ball?.setPositionWithLocalVector(new BABYLON.Vector3(avatar.position.x, avatar.position.z, avatar.position.y));
+                }
+            }
+        }         
     }
 
     async addOtherAvatar(uuid: string, position: vec3) {
@@ -230,7 +220,6 @@ export class VScene {
     }
 
     // When scene is initialized add existing other avatars in world to scene.
-    //Currently not working correctly! assumed due to store not being updated properly?
     async addOtherAvatarsToScene(): Promise<void> {
         for (const avatar of Store.state.avatars.avatarsInfo.values()) {
             console.log("inside for loop of addingOtherAvatarsToScene");
@@ -289,7 +278,7 @@ export class VScene {
         aScene.clearColor = new Color4(0.8, 0.8, 0.8, 0.0);
         // aScene.createDefaultCameraOrLight(true, true, true);
         aScene.createDefaultEnvironment();
-        var camera = new BABYLON.FreeCamera("sceneCamera", new BABYLON.Vector3(0, 1, -10), aScene);
+        var camera = new BABYLON.FreeCamera("sceneCamera", new BABYLON.Vector3(0, 0, -5), aScene);
         aScene.activeCamera?.attachControl(aScene, true);
         camera.inputs.attached.keyboard.detachControl();
 
